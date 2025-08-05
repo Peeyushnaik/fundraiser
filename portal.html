@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundraising Intern Portal</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .glass-card {
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .gradient-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: all 0.3s ease;
+        }
+        .gradient-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        .reward-item {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+        .reward-item:hover {
+            transform: translateX(8px);
+            border-left-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        .leaderboard-item {
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Mock backend data
+        const mockInternData = {
+            name: "Sarah Johnson",
+            referralCode: "sarah2025",
+            totalDonations: 12750,
+            rank: 3,
+            totalInterns: 25
+        };
+
+        const mockLeaderboard = [
+            { name: "Alex Chen", donations: 18500, code: "alex2025" },
+            { name: "Maria Rodriguez", donations: 15200, code: "maria2025" },
+            { name: "Sarah Johnson", donations: 12750, code: "sarah2025" },
+            { name: "David Kim", donations: 11200, code: "david2025" },
+            { name: "Emma Wilson", donations: 9800, code: "emma2025" }
+        ];
+
+        const rewards = [
+            { threshold: 5000, title: "Bronze Achiever", description: "Certificate + Company Swag", unlocked: true },
+            { threshold: 10000, title: "Silver Champion", description: "Certificate + Swag + Mentor Session", unlocked: true },
+            { threshold: 15000, title: "Gold Leader", description: "All above + Letter of Recommendation", unlocked: false },
+            { threshold: 25000, title: "Platinum Elite", description: "All above + Job Interview Guarantee", unlocked: false },
+            { threshold: 50000, title: "Diamond Legend", description: "All above + $1000 Bonus + Full-time Offer", unlocked: false }
+        ];
+
+        function LoginPage({ onLogin }) {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                // Dummy login - accept any credentials
+                onLogin();
+            };
+
+            return (
+                <div className="min-h-screen flex items-center justify-center p-4">
+                    <div className="glass-card rounded-2xl p-8 w-full max-w-md">
+                        <div className="text-center mb-8">
+                            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i className="fas fa-hand-holding-heart text-white text-2xl"></i>
+                            </div>
+                            <h1 className="text-3xl font-bold text-white mb-2">Intern Portal</h1>
+                            <p className="text-gray-200">Fundraising Dashboard</p>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-200 mb-2">Email</label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="intern@company.com"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-200 mb-2">Password</label>
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="••••••••"
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                className="w-full gradient-btn text-white font-semibold py-3 px-6 rounded-lg"
+                            >
+                                Sign In
+                            </button>
+                        </form>
+
+                        <div className="mt-6 text-center">
+                            <p className="text-gray-300 text-sm">
+                                Demo: Use any email/password to login
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function Dashboard({ onLogout }) {
+            const [currentTab, setCurrentTab] = useState('dashboard');
+
+            const StatCard = ({ icon, label, value, color }) => (
+                <div className={`stat-card rounded-xl p-6 text-center ${color}`}>
+                    <div className="text-3xl mb-2">
+                        <i className={icon}></i>
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-1">{value}</h3>
+                    <p className="text-gray-200 text-sm">{label}</p>
+                </div>
+            );
+
+            const LeaderboardItem = ({ intern, index, isCurrentUser = false }) => (
+                <div 
+                    className={`leaderboard-item flex items-center justify-between p-4 rounded-lg mb-3 ${
+                        isCurrentUser ? 'bg-gradient-to-r from-yellow-400/20 to-orange-500/20 border border-yellow-400/30' : 'bg-white/5'
+                    }`}
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                    <div className="flex items-center space-x-4">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                            index === 0 ? 'bg-yellow-500 text-black' :
+                            index === 1 ? 'bg-gray-400 text-black' :
+                            index === 2 ? 'bg-amber-600 text-white' :
+                            'bg-white/20 text-white'
+                        }`}>
+                            {index + 1}
+                        </div>
+                        <div>
+                            <h4 className="font-semibold text-white">{intern.name}</h4>
+                            <p className="text-gray-300 text-sm">Code: {intern.code}</p>
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <p className="font-bold text-white">${intern.donations.toLocaleString()}</p>
+                        {isCurrentUser && <p className="text-yellow-400 text-xs">You</p>}
+                    </div>
+                </div>
+            );
+
+            const RewardItem = ({ reward, index }) => (
+                <div className={`reward-item p-4 rounded-lg mb-3 ${reward.unlocked ? 'bg-green-500/20' : 'bg-white/5'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-white flex items-center">
+                            <i className={`fas ${reward.unlocked ? 'fa-check-circle text-green-400' : 'fa-lock text-gray-400'} mr-2`}></i>
+                            {reward.title}
+                        </h4>
+                        <span className="text-sm text-gray-300">${reward.threshold.toLocaleString()}</span>
+                    </div>
+                    <p className="text-gray-300 text-sm">{reward.description}</p>
+                    {!reward.unlocked && (
+                        <div className="mt-2">
+                            <div className="bg-white/10 rounded-full h-2">
+                                <div 
+                                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                                    style={{ width: `${Math.min(100, (mockInternData.totalDonations / reward.threshold) * 100)}%` }}
+                                ></div>
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">
+                                ${(reward.threshold - mockInternData.totalDonations).toLocaleString()} to go
+                            </p>
+                        </div>
+                    )}
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen p-4">
+                    <div className="max-w-7xl mx-auto">
+                        {/* Header */}
+                        <div className="glass-card rounded-2xl p-6 mb-6">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h1 className="text-3xl font-bold text-white mb-2">
+                                        Welcome back, {mockInternData.name}! 👋
+                                    </h1>
+                                    <p className="text-gray-200">Track your fundraising progress and achievements</p>
+                                </div>
+                                <button
+                                    onClick={onLogout}
+                                    className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all"
+                                >
+                                    <i className="fas fa-sign-out-alt mr-2"></i>
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Navigation */}
+                        <div className="glass-card rounded-2xl p-2 mb-6">
+                            <div className="flex space-x-2">
+                                {[
+                                    { id: 'dashboard', label: 'Dashboard', icon: 'fa-home' },
+                                    { id: 'leaderboard', label: 'Leaderboard', icon: 'fa-trophy' },
+                                    { id: 'rewards', label: 'Rewards', icon: 'fa-gift' }
+                                ].map(tab => (
+                                    <button
+                                        key={tab.id}
+                                        onClick={() => setCurrentTab(tab.id)}
+                                        className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
+                                            currentTab === tab.id 
+                                                ? 'gradient-btn text-white' 
+                                                : 'text-gray-300 hover:bg-white/10'
+                                        }`}
+                                    >
+                                        <i className={`fas ${tab.icon} mr-2`}></i>
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Dashboard Tab */}
+                        {currentTab === 'dashboard' && (
+                            <div className="space-y-6">
+                                {/* Stats Grid */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <StatCard
+                                        icon="fas fa-dollar-sign"
+                                        label="Total Raised"
+                                        value={`$${mockInternData.totalDonations.toLocaleString()}`}
+                                        color="bg-gradient-to-br from-green-500/20 to-emerald-600/20"
+                                    />
+                                    <StatCard
+                                        icon="fas fa-code"
+                                        label="Referral Code"
+                                        value={mockInternData.referralCode}
+                                        color="bg-gradient-to-br from-blue-500/20 to-cyan-600/20"
+                                    />
+                                    <StatCard
+                                        icon="fas fa-medal"
+                                        label="Current Rank"
+                                        value={`#${mockInternData.rank}`}
+                                        color="bg-gradient-to-br from-purple-500/20 to-pink-600/20"
+                                    />
+                                    <StatCard
+                                        icon="fas fa-users"
+                                        label="Total Interns"
+                                        value={mockInternData.totalInterns}
+                                        color="bg-gradient-to-br from-orange-500/20 to-red-600/20"
+                                    />
+                                </div>
+
+                                {/* Progress Section */}
+                                <div className="glass-card rounded-2xl p-6">
+                                    <h2 className="text-2xl font-bold text-white mb-4">
+                                        <i className="fas fa-chart-line mr-2"></i>
+                                        Progress to Next Reward
+                                    </h2>
+                                    <div className="bg-white/10 rounded-full h-4 mb-2">
+                                        <div 
+                                            className="bg-gradient-to-r from-green-500 to-blue-500 h-4 rounded-full transition-all duration-1000"
+                                            style={{ width: `${(mockInternData.totalDonations / 15000) * 100}%` }}
+                                        ></div>
+                                    </div>
+                                    <div className="flex justify-between text-sm text-gray-300">
+                                        <span>${mockInternData.totalDonations.toLocaleString()}</span>
+                                        <span>Next: Gold Leader ($15,000)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Leaderboard Tab */}
+                        {currentTab === 'leaderboard' && (
+                            <div className="glass-card rounded-2xl p-6">
+                                <h2 className="text-2xl font-bold text-white mb-6">
+                                    <i className="fas fa-trophy mr-2"></i>
+                                    Fundraising Leaderboard
+                                </h2>
+                                {mockLeaderboard.map((intern, index) => (
+                                    <LeaderboardItem
+                                        key={intern.code}
+                                        intern={intern}
+                                        index={index}
+                                        isCurrentUser={intern.name === mockInternData.name}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Rewards Tab */}
+                        {currentTab === 'rewards' && (
+                            <div className="glass-card rounded-2xl p-6">
+                                <h2 className="text-2xl font-bold text-white mb-6">
+                                    <i className="fas fa-gift mr-2"></i>
+                                    Rewards & Achievements
+                                </h2>
+                                {rewards.map((reward, index) => (
+                                    <RewardItem key={index} reward={reward} index={index} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+            return (
+                <div>
+                    {isLoggedIn ? (
+                        <Dashboard onLogout={() => setIsLoggedIn(false)} />
+                    ) : (
+                        <LoginPage onLogin={() => setIsLoggedIn(true)} />
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
